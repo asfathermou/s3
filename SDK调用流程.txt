@@ -1,0 +1,120 @@
+    初始化增加四个参数
+    ipaddress = '127.0.0.1'
+    room_id = 1
+    camp_id = 1
+    scenario_id = 1
+    seat_id = '101,102'
+    csfSdk = CSFInterface(ipaddress, room_id, camp_id, scenario_id, seat_id)
+    #注册回调函数，需要在登录之前先注册
+    csfSdk.register(testws)
+    #1.1 授权登录
+    rs = csfSdk.login('ztao', 'woaiwojia')
+    #1.7 加入房间
+    # joinRoom = csfSdk.joinRoom()
+    # print('===joinRoom===')
+    # print(joinRoom)
+    #1.4 获取想定
+    # scenarion = csfSdk.fetchScenario()
+    # print(scenarion.scenario_id)
+
+    # 两个AI都加入房间，并获取想定后，服务端发送开始比赛指令
+    # 服务端会发送一个startGame的websocket消息，AI收到消息后开始比赛
+
+    #3.1派兵时节
+    # sendTroops = csfSdk.battle_seat.sendTroops([{"operator_id":120201,"position":"6,8"},{"operator_id":130301,"position":"4,10"},{"operator_id":130302,"position":"4,10"},{"operator_id":110101,"position":"4,10"}])
+    # print("派兵时节")
+    # print(sendTroops)
+    #3.2兵力初始位置调整
+    # adjustingInitialPosition = csfSdk.battle_seat.adjustingInitialPosition([{"operator_id":210402,"position":"7,17"}])
+    # print("兵力初始位置调整")
+    # print(adjustingInitialPosition)
+    #3.3 航空任务初始化接口
+    # aviationTaskInitialization = csfSdk.battle_seat.aviationTaskInitialization()
+    # print("航空任务初始化接口")
+    # print(aviationTaskInitialization)
+    #3.4 航空任务部署接口
+    # aviationMissionDict = [{"scenario_id":1,"operator_id":130403,"room_id":145,"type":201,"camp":1,"seat":101,"zone_id":1,"rounds":2,"flag":701,"position":"8,13"}]
+    # aviationMissionDeployment = csfSdk.battle_seat.aviationMissionDeployment(aviationMissionDict)
+    # print("航空任务部署接口")
+    # print(aviationMissionDeployment)
+    #3.5 截击驱逐时节接口
+    # operator_ids = ['230301','230302','230201','230401','230402','230701','230101','230102']
+    # attack_type = 107
+    # action_type = 3
+    # section_id = 30501
+    # is_long_air = 0
+    # is_return = 0
+    # is_expel = 1
+    # aviationVolleyExpulsion = csfSdk.battle_seat.aviationVolleyExpulsion(attack_type, action_type, section_id, is_long_air, is_return, is_expel, operator_ids)
+    # print("截击驱逐时节接口")
+    # print(aviationVolleyExpulsion)
+    #3.6 飞机布雷数据接口
+    # operatorDict = [{"operator_id": 130403, "position": "8,13"},{"operator_id": 130404, "position": "8,13"}]
+    # aircraftBray = csfSdk.battle_seat.aircraftBray(operatorDict)
+    # print("飞机布雷数据接口")
+    # print(aircraftBray)
+    #3.7 预警指挥机部署
+    # operatorDict = {"room_id":1471,"camp_id":1,"operators":[{"operator_id":130201,"seat_id":101,"position":"1,2"},{"operator_id":130401,"seat_id":101,"position":"1,2"},{"operator_id":130403,"seat_id":101,"position":"1,2"},{"operator_id":130601,"seat_id":101,"position":"1,2"},{"operator_id":130602,"seat_id":101,"position":"1,2"}]}
+    # operatorDict = [{"operator_id":130201,"seat_id":101,"position":"1,2"},{"operator_id":130401,"seat_id":101,"position":"1,2"},{"operator_id":130403,"seat_id":101,"position":"1,2"},{"operator_id":130601,"seat_id":101,"position":"1,2"},{"operator_id":130602,"seat_id":101,"position":"1,2"}]
+    # awacsDeployment = csfSdk.battle_seat.awacsDeployment(operatorDict)
+    # print("预警指挥机部署")
+    # print(awacsDeployment)
+    # 3.8 战斗空中巡逻
+    # operatorDict = [{"operator_id": 130403, "seat_id":101, "position": "8,13"},{"operator_id": 130404, "seat_id":101, "position": "8,13"}]
+    # airPatrol = csfSdk.battle_seat.airPatrol(operatorDict)
+    # print("战斗空中巡逻")
+    # print(airPatrol)
+    # 3.9 岸基单位行动计划
+    # actionPlanDict = [{"operator_id": 240301,"type": 1,"target_id": 140202},{"operator_id": 240201,"type": 1,"target_id": 150101}]
+    # shoreUnitActionPlan = csfSdk.battle_seat.shoreUnitActionPlan(actionPlanDict)
+    # print("岸基单位行动计划")
+    # print(shoreUnitActionPlan)
+    # 3.10 作战命令下达
+    # commandDict = {"seat": ['101', '102'], "main_target": ['230402', '230602'], "threaten_target": ['230301', '230302', '230601', '230602', '230701']}
+    # operationalOrdersIssued = csfSdk.battle_seat.operationalOrdersIssued(commandDict)
+    # print("作战命令下达")
+    # print(operationalOrdersIssued)
+    # 3.11 组件编队
+    # operatorIds = ['140202','140201']
+    # position = '1,3'
+    # move = 27
+    # createFormation = csfSdk.operator_seat.createFormation(position, move, operatorIds)
+    # print("组件编队")
+    # print(createFormation)
+    # 3.12 编队调整
+    # adjustFormationDict = {"deleted_formation_ids":[],"changed_formations":[{"operator_id":160107,"country_id":1,"rounds":1,"seat":101,"is_find":0,"operator_ids":["140201","140202"]}]}
+    # adjustFormation = csfSdk.operator_seat.adjustFormation(adjustFormationDict)
+    # print("编队调整")
+    # print(adjustFormation)
+    # 3.13 预设编队顺序
+    # operatorID = 160119
+    # orderAsuw = ['140202','140201']
+    # orderFishAttact = ['140201','140202']
+    # presetFormatioOrder = csfSdk.operator_seat.presetFormatioOrder(operatorID, orderAsuw, orderFishAttact)
+    # print("预设编队顺序")
+    # print(presetFormatioOrder)
+    # 3.14 移交指挥权
+    # operatorID = 160119
+    # receiveSeatID = 201
+    # transferFommand = csfSdk.operator_seat.transferFommand(operatorID, receiveSeatID)
+    # print("移交指挥权")
+    # print(transferFommand)
+    # 3.15 解散编队
+    # operatorID = 160118
+    # disbandedFormations = csfSdk.operator_seat.disbandedFormations(operatorID)
+    # print("解散编队")
+    # print(disbandedFormations)
+    # 3.16 潜艇航行模式设置接口
+    # operatorID = 130201
+    # type = 1
+    # submarineVoyageMode = csfSdk.operator_seat.submarineVoyageMode(operatorID, type)
+    # print("潜艇航行模式设置接口")
+    # print(submarineVoyageMode)
+    # 3.17 作战筹划阶段-各种机动攻击数据接口
+    # operatorID = 120201
+    # act_order = '1'
+    # is_formation = 0
+    # act_content = [{"type":502,"scenario_id":1,"country_id":2,"operator_id":220201,"camp":2,"seat":201,"act_order":"1","rounds":1,"is_formation":0,"act_content":{"operator_id":"220201","camp":2,"seat":201,"act_order":"1","act_list":[{"act_id":1,"type":402,"routes":["9,12","9,11","8,10","7,10","7,11","6,11","5,10","4,10","3,10","3,9","2,8","2,7"],"fp_operator_id":"","src_id":[],"target_id":[],"aggressivity":"","ammunition_num":0,"rounds":0,"is_suicide_attack":0,"support_operator_id":"","land_position":"","land_value":0}],"attack_order":"","attack_list":[]}},{"room_id":1444,"type":402,"scenario_id":1,"country_id":2,"operator_id":240201,"camp":2,"seat":201,"act_order":"1","rounds":1,"is_formation":0,"act_content":{"operator_id":"240201","camp":2,"seat":201,"act_order":"1","act_list":[{"act_id":1,"type":402,"routes":["9,20","8,20"],"fp_operator_id":"","src_id":[],"target_id":[],"aggressivity":"","ammunition_num":0,"rounds":0,"is_suicide_attack":0,"support_operator_id":"","land_position":"","land_value":0}],"attack_order":"","attack_list":[]}},{"room_id":1444,"type":402,"scenario_id":1,"country_id":2,"operator_id":220101,"camp":2,"seat":201,"act_order":"1","rounds":1,"is_formation":0,"act_content":{"operator_id":"220101","camp":2,"seat":201,"act_order":"1","act_list":[{"act_id":1,"type":402,"routes":["7,15","7,16","8,17","8,18","9,18"],"fp_operator_id":"","src_id":[],"target_id":[],"aggressivity":"","ammunition_num":0,"rounds":0,"is_suicide_attack":0,"support_operator_id":"","land_position":"","land_value":0}],"attack_order":"","attack_list":[]}},{"room_id":1444,"type":402,"scenario_id":1,"country_id":2,"operator_id":260201,"camp":2,"seat":201,"act_order":"1","rounds":1,"is_formation":1,"act_content":{"operator_id":"210201,210401","camp":2,"seat":201,"act_order":"1","act_list":[{"act_id":1,"type":402,"routes":["6,16","7,17","7,18","8,19"],"fp_operator_id":"","src_id":[],"target_id":[],"aggressivity":"","ammunition_num":0,"rounds":0,"is_suicide_attack":0,"support_operator_id":"","land_position":"","land_value":0}],"attack_order":"","attack_list":[]}},{"room_id":1444,"type":402,"scenario_id":1,"country_id":2,"operator_id":210402,"camp":2,"seat":201,"act_order":"1","rounds":1,"is_formation":0,"act_content":{"operator_id":"210402","camp":2,"seat":201,"act_order":"1","act_list":[{"act_id":1,"type":402,"routes":["6,15","6,16","7,17","7,18","8,19","8,20","9,21"],"fp_operator_id":"","src_id":[],"target_id":[],"aggressivity":"","ammunition_num":0,"rounds":0,"is_suicide_attack":0,"support_operator_id":"","land_position":"","land_value":0}],"attack_order":"","attack_list":[]}}]
+    # maneuveringAttack = csfSdk.operator_seat.maneuveringAttack(operatorID, act_order, is_formation, act_content)
+    # print("各种机动攻击数据接口")
+    # print(maneuveringAttack)

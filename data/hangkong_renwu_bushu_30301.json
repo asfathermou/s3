@@ -1,0 +1,671 @@
+{
+	"room_id": 1483,
+	"camp_id": 1,
+	"type": "engine",
+	"frame": {
+		"frame_id": 6,
+		"frame_type": "1",
+		"room_id": 1483,
+		"camp_id": 1,
+		"round": 1,
+		"time_interval": 30301,
+		"operators": [
+			{
+			"id": 130101,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130102,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130201,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130202,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130301,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [4, 10],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130302,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [4, 10],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130401,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130403,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130501,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130701,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130702,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 150101,
+			"state": 0,
+			"country": 1,
+			"is_find": true,
+			"seat": 0,
+			"position": [1, 2],
+			"is_ground_building": true,
+			"members": [130101, 130102, 130201, 130202, 130301, 130302, 130401, 130403, 130501, 130701, 130702, 130601, 130602],
+			"is_formation": false,
+			"type2": 501
+		}, {
+			"id": 110201,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [3, 7],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": true,
+			"formation_id": 160101
+		}, {
+			"id": 110202,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [3, 7],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": true,
+			"formation_id": 160101
+		}, {
+			"id": 110302,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [3, 7],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 110402,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [4, 6],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 110101,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [4, 10],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 120101,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [6, 6],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 120201,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [6, 8],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 120202,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [7, 6],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 140201,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [2, 1],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 140301,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [3, 1],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 140202,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [4, 1],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230101,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230102,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230201,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230301,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230302,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230401,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230402,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230601,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230602,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 230701,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [10, 20],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 250102,
+			"state": 0,
+			"country": 2,
+			"is_find": true,
+			"seat": 0,
+			"position": [10, 20],
+			"is_ground_building": true,
+			"members": [230101, 230102, 230201, 230301, 230302, 230401, 230402, 230601, 230602, 230701],
+			"is_formation": false,
+			"type2": 501
+		}, {
+			"id": 130601,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 130602,
+			"country": -1,
+			"state": 0,
+			"is_find": true,
+			"is_find_last": false,
+			"position": [1, 2],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}, {
+			"id": 1102011,
+			"country": -1,
+			"state": 0,
+			"is_find": false,
+			"is_find_last": false,
+			"position": [6, 13],
+			"rel_position": 0.0,
+			"direction_point_pair": [
+				[0, 0],
+				[0, 0]
+			],
+			"seat": -1,
+			"camp": -1,
+			"mine_injury": 0,
+			"is_ground_building": false,
+			"is_formation": false,
+			"formation_id": -1
+		}],
+		"judgements": [],
+		"intercept_expel_winner_camp_ids": {},
+		"other_information": {},
+		"score": [0, 0, 0, -1]
+	}
+}

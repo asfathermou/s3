@@ -1,0 +1,758 @@
+一、开始推演的数据:
+	当type=startGame时，表示本场比赛正式开始，
+		原始数据：
+		{'type': 'startGame', 'action_type': 'start', 'room_id': {'room_id': '1', 'scenario_id': 1}, 'content': '本房间推演马上开始...', 'data': [], 'actiontime': '2020-03-24 16:33:42'}
+	待接收到本条消息，并且待接收完想定信息后，ai进行自己的第一个操作： 派兵 self._sdk.battle_seat.sendNotDispatchTroops([])
+
+
+二、推演过程中的数据:
+在推演过程中，当ai进行操作后，会接收到一些系列的返回数据，收到的数据分为三大类:
+	一是非推演数据(以下1~9):
+		此数据为ai进行一些操作后的直接数据，demo ai未做处理，如果选手需要使用，需选手自行处理
+		例如，在编队调整阶段，ai进行了将算子1和算子2组建编队的操作，那么则会收到一条下面第7条格式的消息，如果后续需要使用算子1和算子2，ai则需要记录下该内容并在后续操作中对该编队进行操作。
+	二是引擎推演数据(以下10)：
+		此数据是主要的态势数据，是推演过程中的整个态势变化，每次操作后，收到该类信息的条数不定，需跟进回合和时节进行相应操作。
+		对该数据的处理与态势的记录，demo ai中已经给出了部分示例，对应操作在ai_algorithm.py中已给出。
+	三是心跳信息(type=ping)：
+		此信息为ai与服务器保持连接的信息，无需处理。
+
+
+准备阶段（派兵时节，兵力初始位置调整时节）
+	当type=preparationstage时，表示是websocket返回的准备阶段数据
+	1、派兵时节
+		原始数据：
+		{"type":"preparationstage","action_type":"sending_soldiers","room_id":"300","content":"\u51c6\u5907\u9636\u6bb5-\u6d3e\u5175\u65f6\u8282-\u4e0d\u51fa\u5175\u7b97\u5b50\u6570\u636e","data":{"room_id":"300","camp_id":"1","data":{"room_id":300,"operator_ids":"160101"}},"createtime":"2020-02-10 10:31:40"}
+		格式化后数据：
+		{
+			"type":"preparationstage",
+			"action_type":"sending_soldiers",	//当action_type=sending_soldiers为派兵时节设置不出动兵力数据
+			"room_id":"300",
+			"content":"准备阶段-派兵时节-不出兵算子数据",
+			"data":{
+				"room_id":"300",
+				"camp_id":"1",
+				"data":{
+					"room_id":300,
+					"operator_ids":"160101"		//不出动兵力算子，多个用英文逗号隔开
+				}
+			},
+			"createtime":"2020-02-10 10:31:40"
+		}
+	2、兵力初始位置调整时节
+	原始数据：
+		{"type":"preparationstage","action_type":"operator_position","room_id":"309","content":"\u51c6\u5907\u9636\u6bb5-\u5175\u529b\u521d\u59cb\u4f4d\u7f6e\u8c03\u6574\u65f6\u8282\u6570\u636e","data":{"room_id":"309","camp_id":"1","data":[{"operator_id":120202,"position":"7,6"}]},"createtime":"2020-02-10 12:43:21"}
+	格式化后数据：
+		{
+			"type":"preparationstage",
+			"action_type":"operator_position",	//当action_type=operator_position 为兵力初始位置调整时节数据
+			"room_id":"309",
+			"content":"准备阶段-兵力初始位置调整时节数据",
+			"data":{
+			"room_id":"309",
+			"camp_id":"1",
+			"data":[	//被调整的算子数据
+				{
+					"operator_id":120202,
+					"position":"7,6"
+				}
+			]
+			},
+			"createtime":"2020-02-10 12:43:21"
+		}
+
+航空作战阶段（航空任务部署数据，预警指挥机部署，战斗空中巡逻任务部署）
+	当type=aviation时，表示是websocket返回的航空作战阶段数据
+	3、航空任务部署数据
+		原始数据：
+		{"type":"aviation","action_type":"aviation_setting","room_id":299,"camp_id":1,"content":"\u822a\u7a7a\u4efb\u52a1\u90e8\u7f72\u5df2\u5b8c\u6210","data":{"room_id":299,"camp_id":1,"operators":[{"scenario_id":2,"operator_id":130601,"room_id":299,"type":101,"camp":1,"seat":101,"zone_id":1,"rounds":1,"flag":0,"position":"4,6"},{"scenario_id":2,"operator_id":130602,"room_id":299,"type":101,"camp":1,"seat":101,"zone_id":1,"rounds":1,"flag":0,"position":"4,6"},{"scenario_id":2,"operator_id":130603,"room_id":299,"type":103,"camp":1,"seat":101,"zone_id":1,"rounds":1,"flag":0,"position":"4,6"},{"scenario_id":2,"operator_id":130604,"room_id":299,"type":103,"camp":1,"seat":101,"zone_id":1,"rounds":1,"flag":0,"position":"4,6"},{"scenario_id":2,"operator_id":130501,"room_id":299,"type":105,"camp":1,"seat":101,"zone_id":1,"rounds":1,"flag":0,"position":"10,3"}]},"createtime":"2020-02-10 10:10:05"}
+		
+		格式化后数据：
+		{
+			"type":"aviation",	//根据该type值判断消息类型，aviation为航空作战阶段的消息
+			"action_type":"aviation_setting", //根据action_type判断，属于航空作战阶段的哪个时节消息，aviation_setting为航空任务部署消息。
+			"room_id":299,
+			"camp_id":1,
+			"content":"航空任务部署已完成",
+			"data":{
+				"room_id":299,
+				"camp_id":1,
+				"operators":[
+					{
+						"scenario_id":2,
+						"operator_id":130601,
+						"room_id":299,
+						"type":101,	//任务类型:101=截机任务,102=布雷任务,103=侦查任务,104=预警指挥任务,105=战术支援任务,201=飞机布雷阶段,202=预警指挥机部署阶段,203=战斗空中巡逻阶段
+						"camp":1,
+						"seat":101,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0, //当type为201时使用,固定值为7,标识为水雷
+						"position":"4,6"
+					},
+					{
+						"scenario_id":2,
+						"operator_id":130602,
+						"room_id":299,
+						"type":101,
+						"camp":1,
+						"seat":101,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"4,6"
+					},
+					{
+						"scenario_id":2,
+						"operator_id":130603,
+						"room_id":299,
+						"type":103,
+						"camp":1,
+						"seat":101,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"4,6"
+					},
+					{
+						"scenario_id":2,
+						"operator_id":130604,
+						"room_id":299,
+						"type":103,
+						"camp":1,
+						"seat":101,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"4,6"
+					},
+					{
+						"scenario_id":2,
+						"operator_id":130501,
+						"room_id":299,
+						"type":105,
+						"camp":1,
+						"seat":101,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"10,3"
+					}
+				]
+			},
+			"createtime":"2020-02-10 10:10:05"
+		}
+	4、预警指挥机部署
+		原始数据：
+		{"type":"aviation","action_type":"awacs_deploy","room_id":301,"camp_id":2,"content":"\u9884\u8b66\u6307\u6325\u673a\u90e8\u7f72\u6210\u529f","data":{"room_id":301,"camp_id":2,"operators":[{"scenario_id":4,"operator_id":230201,"room_id":301,"type":202,"camp":2,"seat":202,"zone_id":1,"rounds":1,"flag":0,"position":"19,19"}]},"createtime":"2020-02-10 17:27:58"}
+		格式化后数据：
+		{
+			"type":"aviation",
+			"action_type":"awacs_deploy",	//action_type为awacs_deploy表示预警指挥部署数据
+			"room_id":301,
+			"camp_id":2,
+			"content":"预警指挥机部署成功",
+			"data":{
+				"room_id":301,
+				"camp_id":2,
+				"operators":[	//部署的算子数据
+					{
+						"scenario_id":4,
+						"operator_id":230201,
+						"room_id":301,
+						"type":202,
+						"camp":2,
+						"seat":202,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"19,19"
+					}
+				]
+			},
+			"createtime":"2020-02-10 17:27:58"
+		}
+	5、战斗空中巡逻任务部署
+	原始数据：
+		{"type":"aviation","action_type":"combat_air_patrol","room_id":301,"camp_id":2,"content":"\u6218\u6597\u7a7a\u4e2d\u5de1\u903b\u90e8\u7f72\u6210\u529f","data":{"room_id":301,"camp_id":2,"operators":[{"scenario_id":4,"operator_id":230301,"room_id":301,"type":203,"camp":2,"seat":202,"zone_id":1,"rounds":1,"flag":0,"position":"19,19"}]},"createtime":"2020-02-10 17:28:34"}
+	格式化后数据：
+		{
+			"type":"aviation",
+			"action_type":"combat_air_patrol",	//action_type为combat_air_patrol表示战斗空中巡逻数据
+			"room_id":301,
+			"camp_id":2,
+			"content":"战斗空中巡逻部署成功",
+			"data":{
+				"room_id":301,
+				"camp_id":2,
+				"operators":[	//部署的算子数据
+					{
+						"scenario_id":4,
+						"operator_id":230301,
+						"room_id":301,
+						"type":203,
+						"camp":2,
+						"seat":202,
+						"zone_id":1,
+						"rounds":1,
+						"flag":0,
+						"position":"19,19"
+					}
+				]
+			},
+			"createtime":"2020-02-10 17:28:34"
+		}
+		
+
+6、作战命令下达
+	当type为command时，表示为作战命令下达数据
+	原始数据：
+		{"type":"command","action_type":"combatcommand","room_id":"299","camp_id":"2","content":"\u4f5c\u6218\u547d\u4ee4\u4e0b\u8fbe\u6570\u636e","data":{"room_id":"299","camp_id":"2","data":{"room_id":299,"camp_id":2,"rounds":1,"seat":"201","main_target":"130602","zone_id":"","threaten_target":"133604,130603,130604","user_id":3},"user_id":3},"createtime":"2020-02-10 10:12:10"}
+	格式化后数据：
+		{
+			"type":"command",
+			"action_type":"combatcommand",	//action_type为combatcommand 表示作战命令下达
+			"room_id":"299",
+			"camp_id":"2",
+			"content":"作战命令下达数据",
+			"data":{
+				"room_id":"299",
+				"camp_id":"2",
+				"data":{	//下达的任务
+					"room_id":299,
+					"camp_id":2,
+					"rounds":1,
+					"seat":"201",
+					"main_target":"130602",	//主攻目标算子ID,多个目标英文逗号隔开
+					"zone_id":"",
+					"threaten_target":"133604,130603,130604",	//威胁目标算子ID
+					"user_id":3
+				},
+				"user_id":3
+			},
+			"createtime":"2020-02-10 10:12:10"
+		}
+
+编队调整时节的数据，当type=formation时，表示是websocket返回的编队数据
+7、组建编队：
+	原始数据：
+	{"type":"formation","room_id":"656","action_type":"create_team","content":"qweqwe组建了编队-1","data":{"type":"301","id":260169,"operator_name":"编队-1","category_ch_name":"任务编组","user_id":54,"room_id":"656","camp":"2","formation_operator_id":260169,"army_image":"http:\/\/img.wgengine.bkw100.com\/uploads\/20191226\/4dc51fde5db5827744b0f8435806f6f9.png","model_image":"http:\/\/img.wgengine.bkw100.com\/uploads\/20191230\/0753c69552cb4a2408d751cb58da68e2.png;http:\/\/img.wgengine.bkw100.com\/uploads\/20191230\/754d443a6426bf5326fd8e68cbb2a7eb.png","formation":{"id":"1478","scenario_id":"2","operator_ids":"210401,210201","country_id":"2","seat":"201","is_find":0},"anti_ship_missile":{"scenario_id":"2","operator_ids":"210401,210201","country_id":"2","seat":"201","is_find":0},"bombardment":{"scenario_id":"2","operator_ids":"210401,210201","country_id":"2","seat":"201","is_find":0}},"createtime":"2020-03-08 14:33:45"}
+
+	格式化后数据：
+	{
+		"type":"formation",
+		"room_id":"656",
+		"action_type":"create_team",	//当action_type=create_team为组建编队
+		"content":"qweqwe组建了编队-1",
+		"data":{
+			"type":"301",
+			"id":260169,
+			"operator_name":"编队-1",
+			"category_ch_name":"任务编组",
+			"user_id":54,
+			"room_id":"656",
+			"camp":"2",
+			"formation_operator_id":260169,
+			"army_image":"http://img.wgengine.bkw100.com/uploads/20191226/4dc51fde5db5827744b0f8435806f6f9.png",
+			"model_image":"http://img.wgengine.bkw100.com/uploads/20191230/0753c69552cb4a2408d751cb58da68e2.png;http://img.wgengine.bkw100.com/uploads/20191230/754d443a6426bf5326fd8e68cbb2a7eb.png",
+			"formation":{	//编队
+				"id":"1478",
+				"scenario_id":"2",
+				"operator_ids":"210401,210201", //编队内包含的算子
+				"country_id":"2",
+				"seat":"201",
+				"is_find":0		//是否被侦察发现
+			},
+			"anti_ship_missile":{	//反舰导弹战斗算子执行顺序
+				"scenario_id":"2",
+				"operator_ids":"210401,210201",
+				"country_id":"2",
+				"seat":"201",
+				"is_find":0
+			},
+			"bombardment":{		//轰炸战斗算子执行顺序
+				"scenario_id":"2",
+				"operator_ids":"210401,210201",
+				"country_id":"2",
+				"seat":"201",
+				"is_find":0
+			}
+		},
+		"createtime":"2020-03-08 14:33:45"
+	}
+8、解散编队：
+	原始数据：
+	{"type":"formation","action_type":"disband_formation","room_id":665,"formation_operator_id":260170,"content":"test\u89e3\u6563\u4e86\u7f16\u961f-1","data":{"type":"disband_formation","data":[]},"createtime":"2020-03-10 22:04:09"}
+
+	格式化后数据：
+	{
+		"type":"formation",
+		"action_type":"disband_formation", //action_type为disband_formation时，表示解散编队
+		"room_id":665,
+		"formation_operator_id":260170, //要解散的编队的算子ID，根据编队算子ID移除改编队
+		"content":"test解散了编队-1",
+		"data":{
+		"type":"disband_formation",
+		"data":{}
+		},
+		"createtime":"2020-03-10 22:04:09"
+	}
+
+9、调整编队算子：
+
+	原始数据：
+	{"type":"formation","room_id":665,"action_type":"update_operator_for_team","data":{"type":302,"user_id":3,"room_id":665,"scenario_id":2,"camp":2,"deleted_formation_ids":"260170","changed_formations":[{"operator_id":260170,"country_id":2,"rounds":1,"seat":201,"is_find":0,"operator_ids":"210402,210202"}],"is_find":0,"operator_name":"","category_ch_name":"\u4efb\u52a1\u7f16\u7ec4"},"createtime":"2020-03-10 22:04:09"}
+
+	格式化后数据：
+	{
+		"type":"formation",
+		"room_id":665,
+		"action_type":"update_operator_for_team",	//action_type为update_operator_for_team，表示编队调整
+		"data":{
+			"type":302,
+			"user_id":3,
+			"room_id":665,
+			"scenario_id":2,
+			"camp":2,
+			"deleted_formation_ids":"",	//需要解散的编队的算子ID（AI可留空，需要解散编队可）
+			"changed_formations":[	//编队新增或移除算子后的编队信息
+				{
+					"operator_id":260170,
+					"country_id":2,
+					"rounds":1,
+					"seat":201,
+					"is_find":0,
+					"operator_ids":"210402,210202" 	//调整后的编队算子
+				}
+			],
+			"is_find":0,	//是否被侦察发现
+			"operator_name":"",
+			"category_ch_name":"任务编组"
+		},
+		"createtime":"2020-03-10 22:04:09"
+	}
+
+10、引擎推演数据
+	当type=engine时，表示是引擎推演数据
+	原始数据：
+	{'type': 'engine', 'room_id': '11', 'data': {'frame_id': 35, 'frame_type': '1', 'room_id': 1, 'camp_id': 1, 'round': 1, 'time_interval': 30402, 'operators': [{'id': 150101, 'state': 0, 'country': 1, 'is_find': True, 'seat': 101, 'position': [4, 6], 'is_ground_building': True, 'members': [130601, 130602, 130603, 130604], 'is_formation': False, 'type2': 501}, {'id': 150102, 'state': 0, 'country': 1, 'is_find': True, 'seat': 101, 'position': [10, 3], 'is_ground_building': True, 'members': [130101, 130701, 130501, 133601, 133602, 133603, 133604, 130201], 'is_formation': False, 'type2': 501}, {'id': 130201, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130701, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130501, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 133601, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [16, 16], 'rel_position': 0.5999999999999996, 'direction_point_pair': [[16, 15], [16, 16]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 133602, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 133603, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 133604, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [10, 3], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130601, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [4, 6], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130602, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [4, 6], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130603, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [4, 6], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 130604, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [4, 6], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 250103, 'state': 0, 'country': 2, 'is_find': True, 'seat': 201, 'position': [34, 28], 'is_ground_building': True, 'members': [230101, 230601, 230602, 230603, 230604, 230201], 'is_formation': False, 'type2': 501}, {'id': 250104, 'state': 0, 'country': 2, 'is_find': True, 'seat': 201, 'position': [37, 27], 'is_ground_building': True, 'members': [230605, 230606], 'is_formation': False, 'type2': 501}, {'id': 230201, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [34, 28], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230601, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [25, 18], 'rel_position': 0.9499999999999922, 'direction_point_pair': [[26, 18], [25, 18]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230602, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [34, 28], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230603, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [34, 28], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230604, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [34, 28], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230605, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [37, 27], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}, {'id': 230606, 'country': -1, 'state': 0, 'is_find': True, 'is_find_last': False, 'position': [37, 27], 'rel_position': 0, 'direction_point_pair': [[0, 0], [0, 0]], 'seat': -1, 'camp': -1, 'mine_injury': 0, 'is_ground_building': False, 'is_formation': False, 'formation_id': -1}], 'judgements': [{'type': 1, 'judgement_data': [{'src': [133601], 'tar': [230601], 'type': 1, 'src_damage': 0, 'tar_damage': 0, 'src_if_return': 0, 'tar_if_return': 0, 'injured_operators': [230601], 'injured_damage': [0], 'judgement_description': ['红方【歼10B-1】对空力为10。蓝方【F16C-1】受到0点伤害'], 'judgement_description_detailed': [''], 'defense_correction_value': 0, 'positions': []}]}, {'type': 1, 'judgement_data': [{'src': [230601], 'tar': [133601], 'type': 1, 'src_damage': 0, 'tar_damage': 0, 'src_if_return': 0, 'tar_if_return': 0, 'injured_operators': [133601], 'injured_damage': [0], 'judgement_description': ['蓝方【F16C-1】对空力为11。红方【歼10B-1】受到0点伤害'], 'judgement_description_detailed': [''], 'defense_correction_value': 0, 'positions': []}]}], 'intercept_expel_winner_camp_ids': [], 'other_information': [], 'score': [0, 0, 0, 0]}}
+
+	格式化后数据：
+	{
+		'type': 'engine',
+		'room_id': '11',
+		'data': {
+			'frame_id': 35,		//数据帧id
+			'frame_type': '1',
+			'room_id': 1,
+			'camp_id': 1,
+			'round': 1,			//回合数
+			'time_interval': 30402, //时节id，具体值和代表内容已在ai_algorithm.py中做了处理
+			'operators': [{			//算子信息list
+				'id': 150101,		//算子operator_id,与想定信息中的"operator_id"字段为同一个值
+				'state': 0,			//算子状态，0为正常，每受一级损伤，该值加1
+				'country': 1,
+				'is_find': True,	//是否被敌方侦察到
+				'seat': 101,
+				'position': [4, 6],	//算子坐标
+				'is_ground_building': True,	//是否是建筑物单位
+				'members': [130601, 130602, 130603, 130604], //属于该算子的算子operator_id列表
+				'is_formation': False,	//该算子是否是编队
+				'type2': 501
+			}, {
+				'id': 150102,
+				'state': 0,
+				'country': 1,
+				'is_find': True,
+				'seat': 101,
+				'position': [10, 3],
+				'is_ground_building': True,
+				'members': [130101, 130701, 130501, 133601, 133602, 133603, 133604, 130201],
+				'is_formation': False,
+				'type2': 501
+			}, {
+				'id': 130201,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False, //保留字段，目前为无效值
+				'position': [10, 3],
+				'rel_position': 0,		//保留字段
+				'direction_point_pair': [  //保留字段
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,				//保留字段
+				'camp': -1,				//保留字段
+				'mine_injury': 0,		//保留字段
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 130701,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [10, 3],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1		//如果是编队，该值为所属编队id
+			}, {
+				'id': 130501,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [10, 3],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 133601,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [16, 16],
+				'rel_position': 0.5999999999999996,
+				'direction_point_pair': [
+					[16, 15],
+					[16, 16]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 133602,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [10, 3],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 133603,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [10, 3],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 133604,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [10, 3],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 130601,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [4, 6],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 130602,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [4, 6],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 130603,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [4, 6],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 130604,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [4, 6],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 250103,
+				'state': 0,
+				'country': 2,
+				'is_find': True,
+				'seat': 201,
+				'position': [34, 28],
+				'is_ground_building': True,
+				'members': [230101, 230601, 230602, 230603, 230604, 230201],
+				'is_formation': False,
+				'type2': 501
+			}, {
+				'id': 250104,
+				'state': 0,
+				'country': 2,
+				'is_find': True,
+				'seat': 201,
+				'position': [37, 27],
+				'is_ground_building': True,
+				'members': [230605, 230606],
+				'is_formation': False,
+				'type2': 501
+			}, {
+				'id': 230201,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [34, 28],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230601,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [25, 18],
+				'rel_position': 0.9499999999999922,
+				'direction_point_pair': [
+					[26, 18],
+					[25, 18]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230602,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [34, 28],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230603,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [34, 28],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230604,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [34, 28],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230605,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [37, 27],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}, {
+				'id': 230606,
+				'country': -1,
+				'state': 0,
+				'is_find': True,
+				'is_find_last': False,
+				'position': [37, 27],
+				'rel_position': 0,
+				'direction_point_pair': [
+					[0, 0],
+					[0, 0]
+				],
+				'seat': -1,
+				'camp': -1,
+				'mine_injury': 0,
+				'is_ground_building': False,
+				'is_formation': False,
+				'formation_id': -1
+			}],
+			'judgements': [{	//裁决信息列表
+				'type': 1,		//冗余字段，忽略
+				'judgement_data': [{
+					'src': [133601],	//攻击方operator_id列表
+					'tar': [230601],	//防御方operator_id列表
+					'type': 1,			//裁决类型，0:截击; 1:远距离空对空; 2:驱逐; 3:扫雷; 4:轰炸水面单位; JUDGEMENT_TYPE_fanjiandaodan = 5:反舰导弹; JUDGEMENT_TYPE_daojiaodenglu = 6:岛礁登陆; JUDGEMENT_TYPE_jinju_duijidi = 7:近距战斗; JUDGEMENT_TYPE_xunhangdaodan = 8:巡航导弹; JUDGEMENT_TYPE_yugongzhandou = 9:鱼攻战斗; JUDGEMENT_TYPE_dandaodaodan = 10:弹道导弹; JUDGEMENT_TYPE_shuilei = 11:水雷裁决; JUDGEMENT_TYPE_kongduikong_xingdong = 12:行动裁决时节空对空战斗;
+					'src_damage': 0,	//攻击方受到的总伤害
+					'tar_damage': 0,	//防御方受到的总伤害
+					'src_if_return': 0,	//攻击方是否返航
+					'tar_if_return': 0,	//防御方是否返航
+					'injured_operators': [230601],	//受伤算子operator_id列表,与下个字段"injured_damage"一一对应
+					'injured_damage': [0],			//受伤算子的受伤值，与上个字段"injured_operators"一一对应
+					'judgement_description': ['红方【歼10B-1】对空力为10。蓝方【F16C-1】受到0点伤害'],	//战斗的文字描述
+					'judgement_description_detailed': [''],											//保留字段
+					'defense_correction_value': 0,													//防御战斗中的防御修正值，只对轰炸战斗有效
+					'positions': []																	//扫雷位置坐标列表，只对扫雷有效，( 注：坐标形式:(1,2) )
+				}]
+			}, {
+				'type': 1,
+				'judgement_data': [{
+					'src': [230601],
+					'tar': [133601],
+					'type': 1,
+					'src_damage': 0,
+					'tar_damage': 0,
+					'src_if_return': 0,
+					'tar_if_return': 0,
+					'injured_operators': [133601],
+					'injured_damage': [0],
+					'judgement_description': ['蓝方【F16C-1】对空力为11。红方【歼10B-1】受到0点伤害'],
+					'judgement_description_detailed': [''],
+					'defense_correction_value': 0,
+					'positions': []
+				}]
+			}],
+			'intercept_expel_winner_camp_ids': [],	//截击胜负方的camp_id,已在示例中解析
+			'other_information': [],
+			'score': [0, 0, 0, 0]					//分别代表：红方夺控分,红方歼敌分,蓝方夺控分,蓝方歼敌分
+		}
+	}

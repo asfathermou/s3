@@ -1,0 +1,7 @@
+Fri, 19 Jun 2020 16:33:28 csf_http_client.py[line:957] INFO 请求的地址：/ai/user/login
+Fri, 19 Jun 2020 16:33:28 csf_http_client.py[line:958] INFO 请求的headers：None
+Fri, 19 Jun 2020 16:33:28 connectionpool.py[line:205] DEBUG Starting new HTTP connection (1): 192.168.1.26:80
+Fri, 19 Jun 2020 16:33:28 connectionpool.py[line:393] DEBUG http://192.168.1.26:80 "POST /api/ai/user/login HTTP/1.1" 404 None
+Fri, 19 Jun 2020 16:33:28 csf_http_client.py[line:960] INFO 请求的内容：{'account': 'lyu2', 'password': 'lyu'}
+Fri, 19 Jun 2020 16:33:28 csf_http_client.py[line:962] INFO 获取返回的状态码:404
+Fri, 19 Jun 2020 16:33:28 csf_http_client.py[line:964] INFO 响应内容：{'code': 404, 'msg': 'An error occurred', 'time': 1592555608, 'data': None}
