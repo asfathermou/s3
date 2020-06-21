@@ -499,24 +499,24 @@ class AIAlgorithm:
         """
         self.yujingzhihuiji_deploy_list = []
 
-        if (self.jieji_winner_camp == self._enemy_camp_id) and (self.quzhu_winner_camp == self._enemy_camp_id):
-            # 截击被打败，驱逐也被打败，则不能执行后面的相关航空任务
-            # 不能部署
-            self.yujingzhihuiji_deploy_list = []
-        else:
-            # 可以部署
-            for yujingzhihuiji_id in self.yujingzhihui_renwu_ids:
-                war_operator = battle_state.fetch_our_operator_by_id(yujingzhihuiji_id)
-                if war_operator:
-                    # 该阶段由战役指挥员操作，seat_id固定填写10001,位置自己选择
-
-                    # 选择部署位置
-                    map_center = [self._scenario.war_map.rows // 2, self._scenario.war_map.cols // 2]
-                    path = self._scenario.graph.get_path(war_operator.position, map_center)
-                    deploy_position_str = ",".join([str(path[len(path) // 2][0]), str(path[len(path) // 2][1])])
-
-                    deploy_data = {"operator_id": yujingzhihuiji_id, "seat_id": 10001, "position": deploy_position_str}
-                    self.yujingzhihuiji_deploy_list.append(deploy_data)
+        # if (self.jieji_winner_camp == self._enemy_camp_id) and (self.quzhu_winner_camp == self._enemy_camp_id):
+        #     # 截击被打败，驱逐也被打败，则不能执行后面的相关航空任务
+        #     # 不能部署
+        #     self.yujingzhihuiji_deploy_list = []
+        # else:
+        #     # 可以部署
+        #     for yujingzhihuiji_id in self.yujingzhihui_renwu_ids:
+        #         war_operator = battle_state.fetch_our_operator_by_id(yujingzhihuiji_id)
+        #         if war_operator:
+        #             # 该阶段由战役指挥员操作，seat_id固定填写10001,位置自己选择
+        #
+        #             # 选择部署位置
+        #             map_center = [self._scenario.war_map.rows // 2, self._scenario.war_map.cols // 2]
+        #             path = self._scenario.graph.get_path(war_operator.position, map_center)
+        #             deploy_position_str = ",".join([str(path[len(path) // 2][0]), str(path[len(path) // 2][1])])
+        #
+        #             deploy_data = {"operator_id": yujingzhihuiji_id, "seat_id": 10001, "position": deploy_position_str}
+        #             self.yujingzhihuiji_deploy_list.append(deploy_data)
         self._logger.print(self._round, "ai 发送 预警指挥机部署")
         awacsDeployment = self._sdk.battle_seat.awacsDeployment(self.yujingzhihuiji_deploy_list)
 
@@ -701,259 +701,259 @@ class AIAlgorithm:
         攻击,机动设置
         :param battle_state: 当前战斗态势
         """
-        act_dict = {}
-        attack_dict = {}
-        plan_list = []
-        round_id = self._round
-        seat_id = battle_state.our_operators[0].seat_id
-        camp_id = self._camp_id
-        target_id_01 = 0
-        target_id_02 = 0
-        target_id_03 = 0
-        target_id_04 = 0
-
-        if round_id == 1:
-            act_content = {"operator_id": str(110803), "camp": camp_id, "seat": seat_id,
-                           "act_order": "1",
-                           "act_list": [{"act_id": 1, "type": 402, "routes": ["3,1", "4,1", "5,1"],
-                                         "fp_operator_id": ""}],
-                           "attack_order": "1", "attack_list": []}
-            plan = {"type": 502, "operator_id": 110803, "seat": seat_id,
-                    "act_order": "1",
-                    "is_formation": 0, "act_content": act_content}
-
-            # act_content = {"operator_id": str(our_operator_id), "camp": self._camp_id, "seat": our_operator.seat_id,
-            #                                               "act_order": "1", "act_list": [],
-            #                                               "attack_order": "1", "attack_list": [{"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id":[str(our_operator_id)], "target_id": [str(target_id)], "aggressivity": str(asm_attack), "ammunition_num": 1, "rounds": battle_state.frame.round, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "", "land_value": 0}]}
-            # # 每个算子最多调用一次该接口，一次可以设置多个动作，act_list 设置机动动作，attack_list 设置攻击动作
-            # # print("ai 发送 一个作战计划")
-            #  plan = {"type": 502, "operator_id": our_operator_id, "seat": our_operator.seat_id, "act_order": "1", "is_formation": is_formation, "act_content": act_content}
-            plan_list.append(plan)
-            act_dict[110803] = plan
-
-        # 第2个回合到第6个回合：
-        else:
-            plan_list = []
-            # 当一个位置上有2个算子时，就把他们编成编队？ 待添加
-            # 当0501和0104位置都没有算子的时候，都缩回01，01
-            # 获取我方算子信息
-            df_our_formation = self.df_formation.loc[(self.df_formation['camp_id'] == str(camp_id))]
-            position_str_list = df_our_formation['position_str'].values.tolist()
-            target_position = [1, 1]
-            if '5,1' not in position_str_list and '1,4' not in position_str_list:
-                for operator in df_our_formation.index:
-                    x_position = df_our_formation.at[operator, 'x_position']
-                    y_position = df_our_formation.at[operator, 'y_position']
-                    path = self._graph.get_path([x_position, y_position], target_position)
-                    # 路径去掉起点和终点
-                    path = path[1:]
-                    path_list = []
-                    for path_point in range(len(path)):
-                        path_list.append('{},{}'.format(path[path_point].row, path[path_point].col))
-                        # 远程机动到目标点
-                        act_content = {"operator_id": str(operator), "camp": camp_id, "seat": seat_id,
-                                       "act_order": "1",
-                                       "act_list": [{"act_id": 1, "type": 405, "routes": path_list,
-                                                     "fp_operator_id": ""}],
-                                       "attack_order": "1", "attack_list": []}
-                        plan = {"type": 502, "operator_id": operator, "seat": seat_id,
-                                "act_order": "1",
-                                "is_formation": 0, "act_content": act_content}
-                        plan_list.append(plan)
-                        act_dict[operator] = plan
-
-            # ----110801 算子----------
-            src_id = 110801
-            # 当110801 算子不存活时
-            if src_id not in self.df_operator.index.tolist():
-                # 当110803和110802算子还存活时
-                if 110803 in self.df_operator.index.tolist() and 110802 in self.df_operator.index.tolist():
-                    # 110802 机动到110801位置：
-                    act_content = {"operator_id": str(110802), "camp": camp_id, "seat": seat_id,
-                                   "act_order": "1",
-                                   "act_list": [{"act_id": 1, "type": 402, "routes": ["1,2", "1,3", "1,4"],
-                                                 "fp_operator_id": ""}],
-                                   "attack_order": "1", "attack_list": []}
-                    plan = {"type": 502, "operator_id": 110802, "seat": seat_id,
-                            "act_order": "1",
-                            "is_formation": 0, "act_content": act_content}
-                    plan_list.append(plan)
-                    act_dict[110802] = plan
-
-            # 当110801 算子还存活时
-            else:
-                # 当有能攻击的目标时
-                if self.df_formation.at[src_id, 'asm_attack_id'] != '':
-                    # 获取能攻击的算子id列表
-                    target_id_list = self.target_id_transform(src_id)
-                    # 将被攻击算子排序，然后取第一个：有弹有损算子-有弹无损算子-无弹有损算子-无弹无损算子
-                    target_id_01 = self.select_best_target_id(target_id_list)[0]
-                    asm_attack = self.df_operator.at[src_id, 'asm_attack']
-                    asm_num = self.df_operator.at[src_id, 'asm_num']
-
-                    # 如果还有子弹
-                    if asm_num > 0:
-                        # 拼装攻击数据发送请求
-                        act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
-                                       "act_order": "1",
-                                       "act_list": [],
-                                       "attack_order": "1", "attack_list": [
-                                {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
-                                 "target_id": [str(target_id_01)], "aggressivity": str(asm_attack), "ammunition_num": 1,
-                                 "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
-                                 "land_value": 0}]}
-
-                        plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
-                                "act_order": "1",
-                                "is_formation": 0, "act_content": act_content}
-                        plan_list.append(plan)
-                        attack_dict[src_id] = plan
-
-            # ------ 110803 算子 ---------
-            src_id = 110803
-            # 当110803 算子不存活时
-            if src_id not in self.df_operator.index.tolist():
-                # 当110801和110802算子还存活时
-                if 110801 in self.df_operator.index.tolist() and 110802 in self.df_operator.index.tolist():
-                    # 110802 机动到110803位置：
-                    act_content = {"operator_id": str(110802), "camp": camp_id, "seat": seat_id,
-                                   "act_order": "1",
-                                   "act_list": [{"act_id": 1, "type": 402, "routes": ["3,1", "4,1", "5,1"],
-                                                 "fp_operator_id": ""}],
-                                   "attack_order": "1", "attack_list": []}
-                    plan = {"type": 502, "operator_id": 110802, "seat": seat_id,
-                            "act_order": "1",
-                            "is_formation": 0, "act_content": act_content}
-                    plan_list.append(plan)
-                    act_dict[110802] = plan
-
-            # 当110803 算子还存活时
-            else:
-                # 当有能攻击的目标时
-                if self.df_formation.at[src_id, 'asm_attack_id'] != '':
-                    # 获取能攻击的算子id列表
-                    target_id_list = self.target_id_transform(src_id)
-                    # 将被攻击算子排序，然后取第一个：有弹有损算子-有弹无损算子-无弹有损算子-无弹无损算子
-                    target_id_03 = self.select_best_target_id(target_id_list)[0]
-                    # target_id_03 = self.select_best_target_id(src_id)[0]
-                    asm_attack = self.df_operator.at[src_id, 'asm_attack']
-                    asm_num = self.df_operator.at[src_id, 'asm_num']
-
-                    if asm_num > 0:
-                        # 拼装数据发送请求
-                        act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
-                                       "act_order": "1",
-                                       "act_list": [],
-                                       "attack_order": "1", "attack_list": [
-                                {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
-                                 "target_id": [str(target_id_03)], "aggressivity": str(asm_attack), "ammunition_num": 1,
-                                 "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
-                                 "land_value": 0}]}
-
-                        plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
-                                "act_order": "1",
-                                "is_formation": 0, "act_content": act_content}
-                        plan_list.append(plan)
-                        attack_dict[src_id] = plan
-
-            # 110802 算子
-            src_id = 110802
-            # 当110802算子还存活时
-            if src_id in self.df_operator.index.tolist():
-                asm_attack = self.df_operator.at[src_id, 'asm_attack']
-                asm_num = self.df_operator.at[src_id, 'asm_num']
-                target_id_02 = 0
-                # 获取可攻击算子列表
-                target_id_list = self.target_id_transform(src_id)
-
-                # 如果可以攻击是算子有多个，减去110801和110803算子攻击的目标后
-                if len(target_id_list) > 1:
-                    target_id_list_temp = copy.deepcopy(target_id_list)
-                    if target_id_01 in target_id_list_temp:
-                        target_id_list_temp.remove(target_id_01)
-                    if target_id_03 in target_id_list_temp:
-                        target_id_list_temp.remove(target_id_03)
-                    # 如果减去110801和110803算子攻击的目标后不为空， 排序选择最优的
-                    if target_id_list_temp != []:
-                        target_id_02 = self.select_best_target_id(target_id_list_temp)[0]
-                    # 如果减去110801和110803算子攻击的目标后为空， 随机选择一个目标
-                    else:
-                        random_int = random.randint(0, len(target_id_list) - 1)
-                        target_id_02 = target_id_list[random_int]
-
-                # 如果可以攻击的算子只有1个，则攻击它
-                elif len(target_id_list) == 1:
-                    target_id_02 = target_id_list[0]
-
-                # 如果有可攻击目标时
-                if target_id_02 != 0 and asm_num > 0:
-                    # 拼装数据发送请求
-                    act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
-                                   "act_order": "1",
-                                   "act_list": [],
-                                   "attack_order": "1", "attack_list": [
-                            {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
-                             "target_id": [str(target_id_02)], "aggressivity": str(asm_attack), "ammunition_num": 1,
-                             "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
-                             "land_value": 0}]}
-
-                    plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
-                            "act_order": "1",
-                            "is_formation": 0, "act_content": act_content}
-                    plan_list.append(plan)
-                    attack_dict[src_id] = plan
-
-            # 110804 算子
-            src_id = 110804
-            # 当110804算子还存活时
-            if src_id in self.df_operator.index.tolist():
-                asm_attack = self.df_operator.at[src_id, 'asm_attack']
-                asm_num = self.df_operator.at[src_id, 'asm_num']
-                target_id_04 = 0
-                # 获取可攻击算子列表
-                target_id_list = self.target_id_transform(src_id)
-
-                # 如果可以攻击是算子有多个，减去110801，110802和110803算子攻击的目标后, 排序选择最优的
-                if len(target_id_list) > 1:
-                    target_id_list_temp = copy.deepcopy(target_id_list)
-                    if target_id_01 in target_id_list_temp:
-                        target_id_list_temp.remove(target_id_01)
-                    if target_id_03 in target_id_list_temp:
-                        target_id_list_temp.remove(target_id_03)
-                    if target_id_02 in target_id_list_temp:
-                        target_id_list_temp.remove(target_id_02)
-                        # 如果减去110801,110802和110803算子攻击的目标后不为空， 排序选择最优的
-                    if target_id_list_temp != []:
-                        target_id_04 = self.select_best_target_id(target_id_list_temp)[0]
-                    # 如果减去110801,110802和110803算子攻击的目标后为空， 随机选择一个目标
-                    else:
-                        random_int = random.randint(0, len(target_id_list) - 1)
-                        target_id_04 = target_id_list[random_int]
-
-                # 如果facg2 在可攻击目标中，则优先选facg2
-                if 210804 in target_id_list and 210804 != target_id_01 and 210804 != target_id_02 and 210804 != target_id_03:
-                    target_id_04 = 210804
-
-                # 如果可以攻击的算子只有1个，则攻击它
-                elif len(target_id_list) == 1:
-                    target_id_04 = target_id_list[0]
-
-                if target_id_04 != 0 and asm_num > 0:
-                    # 拼装数据发送请求
-                    act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
-                                   "act_order": "1",
-                                   "act_list": [],
-                                   "attack_order": "1", "attack_list": [
-                            {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
-                             "target_id": [str(target_id_04)], "aggressivity": str(asm_attack), "ammunition_num": 1,
-                             "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
-                             "land_value": 0}]}
-
-                    plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
-                            "act_order": "1",
-                            "is_formation": 0, "act_content": act_content}
-                    plan_list.append(plan)
-                    attack_dict[src_id] = plan
+        # act_dict = {}
+        # attack_dict = {}
+        # plan_list = []
+        # round_id = self._round
+        # seat_id = battle_state.our_operators[0].seat_id
+        # camp_id = self._camp_id
+        # target_id_01 = 0
+        # target_id_02 = 0
+        # target_id_03 = 0
+        # target_id_04 = 0
+        #
+        # if round_id == 1:
+        #     act_content = {"operator_id": str(110803), "camp": camp_id, "seat": seat_id,
+        #                    "act_order": "1",
+        #                    "act_list": [{"act_id": 1, "type": 402, "routes": ["3,1", "4,1", "5,1"],
+        #                                  "fp_operator_id": ""}],
+        #                    "attack_order": "1", "attack_list": []}
+        #     plan = {"type": 502, "operator_id": 110803, "seat": seat_id,
+        #             "act_order": "1",
+        #             "is_formation": 0, "act_content": act_content}
+        #
+        #     # act_content = {"operator_id": str(our_operator_id), "camp": self._camp_id, "seat": our_operator.seat_id,
+        #     #                                               "act_order": "1", "act_list": [],
+        #     #                                               "attack_order": "1", "attack_list": [{"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id":[str(our_operator_id)], "target_id": [str(target_id)], "aggressivity": str(asm_attack), "ammunition_num": 1, "rounds": battle_state.frame.round, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "", "land_value": 0}]}
+        #     # # 每个算子最多调用一次该接口，一次可以设置多个动作，act_list 设置机动动作，attack_list 设置攻击动作
+        #     # # print("ai 发送 一个作战计划")
+        #     #  plan = {"type": 502, "operator_id": our_operator_id, "seat": our_operator.seat_id, "act_order": "1", "is_formation": is_formation, "act_content": act_content}
+        #     plan_list.append(plan)
+        #     act_dict[110803] = plan
+        #
+        # # 第2个回合到第6个回合：
+        # else:
+        #     plan_list = []
+        #     # 当一个位置上有2个算子时，就把他们编成编队？ 待添加
+        #     # 当0501和0104位置都没有算子的时候，都缩回01，01
+        #     # 获取我方算子信息
+        #     df_our_formation = self.df_formation.loc[(self.df_formation['camp_id'] == str(camp_id))]
+        #     position_str_list = df_our_formation['position_str'].values.tolist()
+        #     target_position = [1, 1]
+        #     if '5,1' not in position_str_list and '1,4' not in position_str_list:
+        #         for operator in df_our_formation.index:
+        #             x_position = df_our_formation.at[operator, 'x_position']
+        #             y_position = df_our_formation.at[operator, 'y_position']
+        #             path = self._graph.get_path([x_position, y_position], target_position)
+        #             # 路径去掉起点和终点
+        #             path = path[1:]
+        #             path_list = []
+        #             for path_point in range(len(path)):
+        #                 path_list.append('{},{}'.format(path[path_point].row, path[path_point].col))
+        #                 # 远程机动到目标点
+        #                 act_content = {"operator_id": str(operator), "camp": camp_id, "seat": seat_id,
+        #                                "act_order": "1",
+        #                                "act_list": [{"act_id": 1, "type": 405, "routes": path_list,
+        #                                              "fp_operator_id": ""}],
+        #                                "attack_order": "1", "attack_list": []}
+        #                 plan = {"type": 502, "operator_id": operator, "seat": seat_id,
+        #                         "act_order": "1",
+        #                         "is_formation": 0, "act_content": act_content}
+        #                 plan_list.append(plan)
+        #                 act_dict[operator] = plan
+        #
+        #     # ----110801 算子----------
+        #     src_id = 110801
+        #     # 当110801 算子不存活时
+        #     if src_id not in self.df_operator.index.tolist():
+        #         # 当110803和110802算子还存活时
+        #         if 110803 in self.df_operator.index.tolist() and 110802 in self.df_operator.index.tolist():
+        #             # 110802 机动到110801位置：
+        #             act_content = {"operator_id": str(110802), "camp": camp_id, "seat": seat_id,
+        #                            "act_order": "1",
+        #                            "act_list": [{"act_id": 1, "type": 402, "routes": ["1,2", "1,3", "1,4"],
+        #                                          "fp_operator_id": ""}],
+        #                            "attack_order": "1", "attack_list": []}
+        #             plan = {"type": 502, "operator_id": 110802, "seat": seat_id,
+        #                     "act_order": "1",
+        #                     "is_formation": 0, "act_content": act_content}
+        #             plan_list.append(plan)
+        #             act_dict[110802] = plan
+        #
+        #     # 当110801 算子还存活时
+        #     else:
+        #         # 当有能攻击的目标时
+        #         if self.df_formation.at[src_id, 'asm_attack_id'] != '':
+        #             # 获取能攻击的算子id列表
+        #             target_id_list = self.target_id_transform(src_id)
+        #             # 将被攻击算子排序，然后取第一个：有弹有损算子-有弹无损算子-无弹有损算子-无弹无损算子
+        #             target_id_01 = self.select_best_target_id(target_id_list)[0]
+        #             asm_attack = self.df_operator.at[src_id, 'asm_attack']
+        #             asm_num = self.df_operator.at[src_id, 'asm_num']
+        #
+        #             # 如果还有子弹
+        #             if asm_num > 0:
+        #                 # 拼装攻击数据发送请求
+        #                 act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
+        #                                "act_order": "1",
+        #                                "act_list": [],
+        #                                "attack_order": "1", "attack_list": [
+        #                         {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
+        #                          "target_id": [str(target_id_01)], "aggressivity": str(asm_attack), "ammunition_num": 1,
+        #                          "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
+        #                          "land_value": 0}]}
+        #
+        #                 plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
+        #                         "act_order": "1",
+        #                         "is_formation": 0, "act_content": act_content}
+        #                 plan_list.append(plan)
+        #                 attack_dict[src_id] = plan
+        #
+        #     # ------ 110803 算子 ---------
+        #     src_id = 110803
+        #     # 当110803 算子不存活时
+        #     if src_id not in self.df_operator.index.tolist():
+        #         # 当110801和110802算子还存活时
+        #         if 110801 in self.df_operator.index.tolist() and 110802 in self.df_operator.index.tolist():
+        #             # 110802 机动到110803位置：
+        #             act_content = {"operator_id": str(110802), "camp": camp_id, "seat": seat_id,
+        #                            "act_order": "1",
+        #                            "act_list": [{"act_id": 1, "type": 402, "routes": ["3,1", "4,1", "5,1"],
+        #                                          "fp_operator_id": ""}],
+        #                            "attack_order": "1", "attack_list": []}
+        #             plan = {"type": 502, "operator_id": 110802, "seat": seat_id,
+        #                     "act_order": "1",
+        #                     "is_formation": 0, "act_content": act_content}
+        #             plan_list.append(plan)
+        #             act_dict[110802] = plan
+        #
+        #     # 当110803 算子还存活时
+        #     else:
+        #         # 当有能攻击的目标时
+        #         if self.df_formation.at[src_id, 'asm_attack_id'] != '':
+        #             # 获取能攻击的算子id列表
+        #             target_id_list = self.target_id_transform(src_id)
+        #             # 将被攻击算子排序，然后取第一个：有弹有损算子-有弹无损算子-无弹有损算子-无弹无损算子
+        #             target_id_03 = self.select_best_target_id(target_id_list)[0]
+        #             # target_id_03 = self.select_best_target_id(src_id)[0]
+        #             asm_attack = self.df_operator.at[src_id, 'asm_attack']
+        #             asm_num = self.df_operator.at[src_id, 'asm_num']
+        #
+        #             if asm_num > 0:
+        #                 # 拼装数据发送请求
+        #                 act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
+        #                                "act_order": "1",
+        #                                "act_list": [],
+        #                                "attack_order": "1", "attack_list": [
+        #                         {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
+        #                          "target_id": [str(target_id_03)], "aggressivity": str(asm_attack), "ammunition_num": 1,
+        #                          "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
+        #                          "land_value": 0}]}
+        #
+        #                 plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
+        #                         "act_order": "1",
+        #                         "is_formation": 0, "act_content": act_content}
+        #                 plan_list.append(plan)
+        #                 attack_dict[src_id] = plan
+        #
+        #     # 110802 算子
+        #     src_id = 110802
+        #     # 当110802算子还存活时
+        #     if src_id in self.df_operator.index.tolist():
+        #         asm_attack = self.df_operator.at[src_id, 'asm_attack']
+        #         asm_num = self.df_operator.at[src_id, 'asm_num']
+        #         target_id_02 = 0
+        #         # 获取可攻击算子列表
+        #         target_id_list = self.target_id_transform(src_id)
+        #
+        #         # 如果可以攻击是算子有多个，减去110801和110803算子攻击的目标后
+        #         if len(target_id_list) > 1:
+        #             target_id_list_temp = copy.deepcopy(target_id_list)
+        #             if target_id_01 in target_id_list_temp:
+        #                 target_id_list_temp.remove(target_id_01)
+        #             if target_id_03 in target_id_list_temp:
+        #                 target_id_list_temp.remove(target_id_03)
+        #             # 如果减去110801和110803算子攻击的目标后不为空， 排序选择最优的
+        #             if target_id_list_temp != []:
+        #                 target_id_02 = self.select_best_target_id(target_id_list_temp)[0]
+        #             # 如果减去110801和110803算子攻击的目标后为空， 随机选择一个目标
+        #             else:
+        #                 random_int = random.randint(0, len(target_id_list) - 1)
+        #                 target_id_02 = target_id_list[random_int]
+        #
+        #         # 如果可以攻击的算子只有1个，则攻击它
+        #         elif len(target_id_list) == 1:
+        #             target_id_02 = target_id_list[0]
+        #
+        #         # 如果有可攻击目标时
+        #         if target_id_02 != 0 and asm_num > 0:
+        #             # 拼装数据发送请求
+        #             act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
+        #                            "act_order": "1",
+        #                            "act_list": [],
+        #                            "attack_order": "1", "attack_list": [
+        #                     {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
+        #                      "target_id": [str(target_id_02)], "aggressivity": str(asm_attack), "ammunition_num": 1,
+        #                      "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
+        #                      "land_value": 0}]}
+        #
+        #             plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
+        #                     "act_order": "1",
+        #                     "is_formation": 0, "act_content": act_content}
+        #             plan_list.append(plan)
+        #             attack_dict[src_id] = plan
+        #
+        #     # 110804 算子
+        #     src_id = 110804
+        #     # 当110804算子还存活时
+        #     if src_id in self.df_operator.index.tolist():
+        #         asm_attack = self.df_operator.at[src_id, 'asm_attack']
+        #         asm_num = self.df_operator.at[src_id, 'asm_num']
+        #         target_id_04 = 0
+        #         # 获取可攻击算子列表
+        #         target_id_list = self.target_id_transform(src_id)
+        #
+        #         # 如果可以攻击是算子有多个，减去110801，110802和110803算子攻击的目标后, 排序选择最优的
+        #         if len(target_id_list) > 1:
+        #             target_id_list_temp = copy.deepcopy(target_id_list)
+        #             if target_id_01 in target_id_list_temp:
+        #                 target_id_list_temp.remove(target_id_01)
+        #             if target_id_03 in target_id_list_temp:
+        #                 target_id_list_temp.remove(target_id_03)
+        #             if target_id_02 in target_id_list_temp:
+        #                 target_id_list_temp.remove(target_id_02)
+        #                 # 如果减去110801,110802和110803算子攻击的目标后不为空， 排序选择最优的
+        #             if target_id_list_temp != []:
+        #                 target_id_04 = self.select_best_target_id(target_id_list_temp)[0]
+        #             # 如果减去110801,110802和110803算子攻击的目标后为空， 随机选择一个目标
+        #             else:
+        #                 random_int = random.randint(0, len(target_id_list) - 1)
+        #                 target_id_04 = target_id_list[random_int]
+        #
+        #         # 如果facg2 在可攻击目标中，则优先选facg2
+        #         if 210804 in target_id_list and 210804 != target_id_01 and 210804 != target_id_02 and 210804 != target_id_03:
+        #             target_id_04 = 210804
+        #
+        #         # 如果可以攻击的算子只有1个，则攻击它
+        #         elif len(target_id_list) == 1:
+        #             target_id_04 = target_id_list[0]
+        #
+        #         if target_id_04 != 0 and asm_num > 0:
+        #             # 拼装数据发送请求
+        #             act_content = {"operator_id": str(src_id), "camp": camp_id, "seat": seat_id,
+        #                            "act_order": "1",
+        #                            "act_list": [],
+        #                            "attack_order": "1", "attack_list": [
+        #                     {"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id": [str(src_id)],
+        #                      "target_id": [str(target_id_04)], "aggressivity": str(asm_attack), "ammunition_num": 1,
+        #                      "rounds": round_id, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "",
+        #                      "land_value": 0}]}
+        #
+        #             plan = {"type": 502, "operator_id": src_id, "seat": seat_id,
+        #                     "act_order": "1",
+        #                     "is_formation": 0, "act_content": act_content}
+        #             plan_list.append(plan)
+        #             attack_dict[src_id] = plan
 
         # 3.17 作战筹划阶段-各种机动攻击数据接口
         # operatorID = 120201
@@ -1012,35 +1012,36 @@ class AIAlgorithm:
         # print("ai 发送 作战筹划完成")
         # self._sdk.operator_seat.attack_finished(battle_state.get_time_section_id())
 
-        plan_list_temp = []
-        attack_key = attack_dict.keys()
-        act_key = act_dict.keys()
-        union_key = attack_key & act_key
+        # plan_list_temp = []
+        # attack_key = attack_dict.keys()
+        # act_key = act_dict.keys()
+        # union_key = attack_key & act_key
+        #
+        # for key, value in attack_dict.items():
+        #     if key not in union_key:
+        #         plan_list_temp.append(value)
+        #
+        # for key, value in act_dict.items():
+        #     if key not in union_key:
+        #         plan_list_temp.append(value)
+        #     else:
+        #         value["act_content"]["attack_list"] = attack_dict[key]["act_content"]["attack_list"]
+        #         plan_list_temp.append(value)
 
-        for key, value in attack_dict.items():
-            if key not in union_key:
-                plan_list_temp.append(value)
-
-        for key, value in act_dict.items():
-            if key not in union_key:
-                plan_list_temp.append(value)
-            else:
-                value["act_content"]["attack_list"] = attack_dict[key]["act_content"]["attack_list"]
-                plan_list_temp.append(value)
 
 
-
-        self._logger.print(self._round, "ai 发送 作战筹划 %s " % (plan_list_temp))
-
-        for plan in plan_list_temp:
-            plan_string = '{}: attack: {} \n{}: move: {}'.format(plan['operator_id'], plan['act_content']['attack_list'], plan['operator_id'], plan['act_content']['act_list'])
-            self._plan_string += plan_string
-            print(plan_string)
+        # self._logger.print(self._round, "ai 发送 作战筹划 %s " % (plan_list_temp))
+        #
+        # for plan in plan_list_temp:
+        #     plan_string = '{}: attack: {} \n{}: move: {}'.format(plan['operator_id'], plan['act_content']['attack_list'], plan['operator_id'], plan['act_content']['act_list'])
+        #     self._plan_string += plan_string
+        #     print(plan_string)
                 # print("attack:", plan['operator_id'], plan['act_content']['attack_list'])
             # print("move:", plan['operator_id'], plan['act_content']['act_list'])
 
         # 在此时节，调用一次下方接口
         # 每个算子可以加plan_list中加一个plan，每个plan可以有多个机动动作、多个攻击动作
+        plan_list_temp = []
         maneuveringAttack = self._sdk.operator_seat.maneuveringAttack(plan_list_temp)
 
     def _attack_and_move(self, battle_state):

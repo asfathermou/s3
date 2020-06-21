@@ -45,6 +45,7 @@ class AIAlgorithm:
         self._expulsion_close_air_to_air_counter = 0
 
 
+
         # 不同时节ID到相应的处理函数映射表
         self._decision_map = {
             # 1 分派兵力
@@ -186,48 +187,47 @@ class AIAlgorithm:
         self.bulei_renwu_ids = []
         self.yujingzhihui_renwu_ids = []
 
-        if self._round == 1:
-            e2t_info = helper.fetch_operator(self.df_operator, self._camp_id, "e2t")
-            if e2t_info is None:
-                # E2T预警机已毁
+        e2t_info = helper.fetch_operator(self.df_operator, self._camp_id, "e2t")
+        if e2t_info is None:
+            # E2T预警机已毁
+            pass
+        else:
+            if e2t_info["x_position"] == 22 and e2t_info["y_position"] == 25:
+                # E2T预警机已部署在2225
                 pass
             else:
-                if e2t_info["x_position"] == 22 and e2t_info["y_position"] == 25:
-                    # E2T预警机已部署在2225
-                    pass
-                else:
-                    #  按无损-有损顺序从蓝方F16C-1、2、3、4中选两架空中算子F16C-a和F16C-b，其余全部出动
-                    f1_info = helper.fetch_operator(self.df_operator, self._camp_id, "f1")
-                    f2_info = helper.fetch_operator(self.df_operator, self._camp_id, "f2")
-                    f3_info = helper.fetch_operator(self.df_operator, self._camp_id, "f3")
-                    f4_info = helper.fetch_operator(self.df_operator, self._camp_id, "f4")
-                    order = []
-                    if f1_info is not None:
-                        order.append((f1_info["operator_id"], f1_info["state"]))
-                    if f2_info is not None:
-                        order.append((f2_info["operator_id"], f1_info["state"]))
-                    if f3_info is not None:
-                        order.append((f3_info["operator_id"], f1_info["state"]))
-                    if f4_info is not None:
-                        order.append((f4_info["operator_id"], f1_info["state"]))
-                    order.sort(key=lambda x: x[1])
-                    order = [i[0] for i in order]
-                    if len(order) > 2:
-                        self.jieji_renwu_ids.extend(order[2:])
-                    # self.zhencha_renwu_ids.append(e2t_info["operator_id"])
-                    self.yujingzhihui_renwu_ids.append(e2t_info["operator_id"])
-                    f5_info = helper.fetch_operator(self.df_operator, self._camp_id, "f5")
-                    f6_info = helper.fetch_operator(self.df_operator, self._camp_id, "f6")
-                    f7_info = helper.fetch_operator(self.df_operator, self._camp_id, "f7")
-                    f8_info = helper.fetch_operator(self.df_operator, self._camp_id, "f8")
-                    if f5_info is not None:
-                        self.jieji_renwu_ids.append(f5_info["operator_id"])
-                    if f6_info is not None:
-                        self.jieji_renwu_ids.append(f6_info["operator_id"])
-                    if f7_info is not None:
-                        self.jieji_renwu_ids.append(f7_info["operator_id"])
-                    if f8_info is not None:
-                        self.jieji_renwu_ids.append(f8_info["operator_id"])
+                #  按无损-有损顺序从蓝方F16C-1、2、3、4中选两架空中算子F16C-a和F16C-b，其余全部出动
+                f1_info = helper.fetch_operator(self.df_operator, self._camp_id, "f1")
+                f2_info = helper.fetch_operator(self.df_operator, self._camp_id, "f2")
+                f3_info = helper.fetch_operator(self.df_operator, self._camp_id, "f3")
+                f4_info = helper.fetch_operator(self.df_operator, self._camp_id, "f4")
+                order = []
+                if f1_info is not None:
+                    order.append((f1_info["operator_id"], f1_info["state"]))
+                if f2_info is not None:
+                    order.append((f2_info["operator_id"], f1_info["state"]))
+                if f3_info is not None:
+                    order.append((f3_info["operator_id"], f1_info["state"]))
+                if f4_info is not None:
+                    order.append((f4_info["operator_id"], f1_info["state"]))
+                order.sort(key=lambda x: (x[1], x[0]))
+                order = [i[0] for i in order]
+                if len(order) > 2:
+                    self.jieji_renwu_ids.extend(order[2:])
+                # self.zhencha_renwu_ids.append(e2t_info["operator_id"])
+                self.yujingzhihui_renwu_ids.append(e2t_info["operator_id"])
+                f5_info = helper.fetch_operator(self.df_operator, self._camp_id, "f5")
+                f6_info = helper.fetch_operator(self.df_operator, self._camp_id, "f6")
+                f7_info = helper.fetch_operator(self.df_operator, self._camp_id, "f7")
+                f8_info = helper.fetch_operator(self.df_operator, self._camp_id, "f8")
+                if f5_info is not None:
+                    self.jieji_renwu_ids.append(f5_info["operator_id"])
+                if f6_info is not None:
+                    self.jieji_renwu_ids.append(f6_info["operator_id"])
+                if f7_info is not None:
+                    self.jieji_renwu_ids.append(f7_info["operator_id"])
+                if f8_info is not None:
+                    self.jieji_renwu_ids.append(f8_info["operator_id"])
         aviation_mission_list = []
         # 类型：101:截击任务;102:布雷任务;103:侦察任务;104:预警指挥任务;105:战术支援任务
         for operator_id in self.zhencha_renwu_ids:
@@ -463,7 +463,7 @@ class AIAlgorithm:
         else:
             # 可以部署
             e2t_info = helper.fetch_operator(self.df_operator, self._camp_id, "e2t")
-            if e2t_info is None:
+            if e2t_info is None or (e2t_info["x_position"] == 22 and e2t_info["y_position"] == 25):
                 pass
             else:
                 deploy_data = {"operator_id": e2t_info["operator_id"], "seat_id": 10001, "position": "22,25"}
@@ -477,66 +477,153 @@ class AIAlgorithm:
         部署战斗空中巡逻
         :param battle_state: 当前战斗态势
         """
+        # 机场2534：250101；机场2834：250102，预警机：230201
         deploy_list = []
         # operatorDict = {"operator_id": 130403, "seat_id":101, "position": "8,13", "target_id":182301}
         # deploy_list.append(operatorDict)
         e2t_info = helper.fetch_operator(self.df_operator, self._camp_id, "e2t")
-        if e2t_info is None:
-            pass
+        if e2t_info is None or e2t_info["x_position"] != 22 or e2t_info["y_position"] != 25:
+            f1_info = helper.fetch_operator(self.df_operator, self._camp_id, "f1")
+            f2_info = helper.fetch_operator(self.df_operator, self._camp_id, "f2")
+            f3_info = helper.fetch_operator(self.df_operator, self._camp_id, "f3")
+            f4_info = helper.fetch_operator(self.df_operator, self._camp_id, "f4")
+            order = []
+            if f1_info is not None:
+                order.append(f1_info["operator_id"])
+            if f2_info is not None:
+                order.append(f2_info["operator_id"])
+            if f3_info is not None:
+                order.append(f3_info["operator_id"])
+            if f4_info is not None:
+                order.append(f4_info["operator_id"])
+            for i in order:
+                deploy_data = {"operator_id": i, "seat_id": 201, "position": "25,34", "target_id": 250101}
+                deploy_list.append(deploy_data)
+            f5_info = helper.fetch_operator(self.df_operator, self._camp_id, "f5")
+            f6_info = helper.fetch_operator(self.df_operator, self._camp_id, "f6")
+            f7_info = helper.fetch_operator(self.df_operator, self._camp_id, "f7")
+            f8_info = helper.fetch_operator(self.df_operator, self._camp_id, "f8")
+            order = []
+            if f5_info is not None:
+                order.append(f5_info["operator_id"])
+            if f6_info is not None:
+                order.append(f6_info["operator_id"])
+            if f7_info is not None:
+                order.append(f7_info["operator_id"])
+            if f8_info is not None:
+                order.append(f8_info["operator_id"])
+            for i in order:
+                deploy_data = {"operator_id": i, "seat_id": 201, "position": "28,34", "target_id": 250102}
+                deploy_list.append(deploy_data)
         else:
-            if e2t_info["x_position"] == 22 and e2t_info["y_position"] == 25:
+            f1_info = helper.fetch_operator(self.df_operator, self._camp_id, "f1")
+            f2_info = helper.fetch_operator(self.df_operator, self._camp_id, "f2")
+            f3_info = helper.fetch_operator(self.df_operator, self._camp_id, "f3")
+            f4_info = helper.fetch_operator(self.df_operator, self._camp_id, "f4")
+            order1 = []
+            if f1_info is not None:
+                order1.append((f1_info["operator_id"], f1_info["state"]))
+            if f2_info is not None:
+                order1.append((f2_info["operator_id"], f2_info["state"]))
+            if f3_info is not None:
+                order1.append((f3_info["operator_id"], f3_info["state"]))
+            if f4_info is not None:
+                order1.append((f4_info["operator_id"], f4_info["state"]))
+            order1.sort(key=lambda x: (x[1], x[0]))
+            order1 = [i[0] for i in order1]
+
+            f5_info = helper.fetch_operator(self.df_operator, self._camp_id, "f5")
+            f6_info = helper.fetch_operator(self.df_operator, self._camp_id, "f6")
+            f7_info = helper.fetch_operator(self.df_operator, self._camp_id, "f7")
+            f8_info = helper.fetch_operator(self.df_operator, self._camp_id, "f8")
+            order2 = []
+            if f5_info is not None:
+                order2.append((f5_info["operator_id"], f5_info["state"]))
+            if f6_info is not None:
+                order2.append((f6_info["operator_id"], f6_info["state"]))
+            if f7_info is not None:
+                order2.append((f7_info["operator_id"], f7_info["state"]))
+            if f8_info is not None:
+                order2.append((f8_info["operator_id"], f8_info["state"]))
+            order2.sort(key=lambda x: (x[1], x[0]))
+            order2 = [i[0] for i in order2]
+            if self.jieji_renwu_ids == [] or self.jieji_winner_camp == self._camp_id:
+                # 此一回合未部署航空任务或者截击胜利，这回合存活的f飞机都可以战斗空中巡逻
+                if len(order1) > 2 and len(order2) > 2:
+                    for i in order1[:2]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "25,34", "target_id": 250101}
+                        deploy_list.append(deploy_data)
+                    for i in order1[2:]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                        deploy_list.append(deploy_data)
+                    for i in order2[:2]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "28,34", "target_id": 250102}
+                        deploy_list.append(deploy_data)
+                    for i in order2[2:]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                        deploy_list.append(deploy_data)
+                elif len(order1) <= 2 and len(order2) > 2:
+                    for i in order1:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "25,34", "target_id": 250101}
+                        deploy_list.append(deploy_data)
+                    for i in order2[:1]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "28,34", "target_id": 250102}
+                        deploy_list.append(deploy_data)
+                    for i in order2[1:]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                        deploy_list.append(deploy_data)
+                elif len(order1) > 2 and len(order2) <= 2:
+                    for i in order1[:2]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "25,34", "target_id": 250101}
+                        deploy_list.append(deploy_data)
+                    for i in order1[2:]:
+                        deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                        deploy_list.append(deploy_data)
+                    if len(order2) == 2:
+                        for i in order2[:1]:
+                            deploy_data = {"operator_id": i, "seat_id": 201, "position": "28,34", "target_id": 250102}
+                            deploy_list.append(deploy_data)
+                        for i in order2[1:]:
+                            deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                            deploy_list.append(deploy_data)
+                    elif len(order2) < 2:
+                        for i in order2:
+                            deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                            deploy_list.append(deploy_data)
+            else:
                 f1_info = helper.fetch_operator(self.df_operator, self._camp_id, "f1")
                 f2_info = helper.fetch_operator(self.df_operator, self._camp_id, "f2")
                 f3_info = helper.fetch_operator(self.df_operator, self._camp_id, "f3")
                 f4_info = helper.fetch_operator(self.df_operator, self._camp_id, "f4")
                 order = []
                 if f1_info is not None:
-                    order.append((f1_info["operator_id"], f1_info["state"]))
+                    order.append(f1_info["operator_id"])
                 if f2_info is not None:
-                    order.append((f2_info["operator_id"], f1_info["state"]))
+                    order.append(f2_info["operator_id"])
                 if f3_info is not None:
-                    order.append((f3_info["operator_id"], f1_info["state"]))
+                    order.append(f3_info["operator_id"])
                 if f4_info is not None:
-                    order.append((f4_info["operator_id"], f1_info["state"]))
-                order.sort(key=lambda x: x[1])
-                order = [i[0] for i in order]
-                if len(order) <= 2:
-                    for i in order:
-                        deploy_data = {"operator_id": i, "seat_id": 101, "position": "22,25"}
-                        deploy_list.append(deploy_data)
-                else:
-                    for i in order[:2]:
-                        deploy_data = {"operator_id": i, "seat_id": 101, "position": "25,34"}
-                        deploy_list.append(deploy_data)
-                    for i in order[:2]:
-                        deploy_data = {"operator_id": i, "seat_id": 101, "position": "22,25"}
-                        deploy_list.append(deploy_data)
+                    order.append(f4_info["operator_id"])
+                for i in order:
+                    deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                    deploy_list.append(deploy_data)
                 f5_info = helper.fetch_operator(self.df_operator, self._camp_id, "f5")
                 f6_info = helper.fetch_operator(self.df_operator, self._camp_id, "f6")
                 f7_info = helper.fetch_operator(self.df_operator, self._camp_id, "f7")
                 f8_info = helper.fetch_operator(self.df_operator, self._camp_id, "f8")
                 order = []
                 if f5_info is not None:
-                    order.append((f5_info["operator_id"], f5_info["state"]))
+                    order.append(f5_info["operator_id"])
                 if f6_info is not None:
-                    order.append((f6_info["operator_id"], f6_info["state"]))
+                    order.append(f6_info["operator_id"])
                 if f7_info is not None:
-                    order.append((f7_info["operator_id"], f7_info["state"]))
+                    order.append(f7_info["operator_id"])
                 if f8_info is not None:
-                    order.append((f8_info["operator_id"], f8_info["state"]))
-                order.sort(key=lambda x: x[1])
-                order = [i[0] for i in order]
-                if len(order) <= 2:
-                    for i in order:
-                        deploy_data = {"operator_id": i, "seat_id": 101,  "position": "22,25"}
-                        deploy_list.append(deploy_data)
-                else:
-                    for i in order[:2]:
-                        deploy_data = {"operator_id": i, "seat_id": 101, "position": "28,34"}
-                        deploy_list.append(deploy_data)
-                    for i in order[:2]:
-                        deploy_data = {"operator_id": i, "seat_id": 101, "position": "22,25"}
-                        deploy_list.append(deploy_data)
+                    order.append(f8_info["operator_id"])
+                for i in order:
+                    deploy_data = {"operator_id": i, "seat_id": 201, "position": "22,25", "target_id": 230201}
+                    deploy_list.append(deploy_data)
+
         self._logger.print(self._round, "ai 发送 战斗空中巡逻")
         # 在此时节，调用一次下方接口
         res = self._sdk.battle_seat.airPatrol(deploy_list)
@@ -699,6 +786,20 @@ class AIAlgorithm:
 
         return target_id_list
 
+    def generate_move_plan(self, operator_id, camp_id, seat_id, formation_id, start, end):
+        path = self._scenario.graph.get_path(start, end)
+        path = path[1:]
+        path_list = [f"{i.row},{i.col}" for i in path]
+        is_formation = operator_id != formation_id
+        act_content = {"operator_id": str(operator_id), "camp": camp_id, "seat": seat_id,
+                       "act_order": "1",
+                       "act_list": [{"act_id": 1, "type": 405, "routes": path_list,
+                                     "fp_operator_id": ""}],
+                       "attack_order": "1", "attack_list": []}
+        plan = {"type": 402, "operator_id": formation_id, "seat": seat_id,
+                "act_order": "1",
+                "is_formation": is_formation, "act_content": act_content}
+        return plan
 
     def _set_attack_and_move(self, battle_state):
         """
@@ -712,79 +813,113 @@ class AIAlgorithm:
         seat_id = battle_state.our_operators[0].seat_id
         camp_id = self._camp_id
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # # 3.17 作战筹划阶段-各种机动攻击数据接口
-        # # operatorID = 120201
-        # # act_order = '1'
-        # # is_formation = 0
-        # # maneuveringAttack = self._sdk.operator_seat.maneuveringAttack(operatorID, act_order, is_formation, act_content)
-        #
-        # # 当反舰导弹发起攻击编队目标时，从引擎获取具体攻击目标中的哪些单位
-        # # 示例：
-        # # round_id = self._round
-        # # attack_formation_id = 160101
-        # # attack_operator_ids = [130101, 130102, 130103]
-        # # target_formation_id = 260101
-        # # target_operator_ids = [230101, 230102, 230103]
-        # # select_result = self._sdk.operator_seat.antiShipMissilesTargetSelect(round_id, attack_formation_id,
-        # #                                                               attack_operator_ids, target_formation_id,
-        # #                                                               target_operator_ids)
-        # # 如果返回select_result为以下结构的dict则为获取成功，如果返回其他结果则为获取失败。为加强程序的稳定性，应对获取失败(非以下结构的dict)以及获取超时做处理
-        # # 如果获取成功，select_result结构如下
-        # # select_result["result"]  # "false"代表获取失败，"true"代表获取到了结果
-        # # select_result["rand_num"]  # 随机数的值
-        # # select_result["select_target_ids"]  # 攻击目标的operator_id列表
-        # # select_result["error_code"] = "None"  # 错误码
-        #
-        # # # 发送机动，攻击计划
-        # plan_list = []
-        #
-        # our_kongzhong_ids = battle_state.fetch_our_operator_ids_by_category_id1(const.kongzhongdanwei_id)
-        # enemy_shuimian_ids = battle_state.fetch_enemy_operator_ids_by_category_id1(const.shuimiandanwei_id)
-        # if our_kongzhong_ids:  # 随机选取一个空中单位发起攻击
-        #
-        #     our_operator_id = random.sample(our_kongzhong_ids, 1)[0]
-        #     # 1，反舰导弹攻击(type 502, 目标:水面单位)  判断是否有反舰导弹能力(asm_attack:反舰导弹攻击值，asm_range:反舰导弹射程，asm_num：反舰导弹数量)
-        #     our_operator = battle_state.fetch_operator_by_id(our_operator_id)
-        #     # 根据state，获取相应属性的值（类似asm_attack这样的属性，是一个数组，具体算子该值取哪个值要根据state进行取值）
-        #     if our_operator.asm_attack and (our_operator.state < 2):  # 先判断算子该属性是否有值,且算子不是死亡
-        #         asm_attack = our_operator.asm_attack[our_operator.state]
-        #         # asm_range 可以判断射程内再射击，如果不在射程内，射击可能不会发生
-        #         # asm_num 弹药数量
-        #         if asm_attack > 0:
-        #             if enemy_shuimian_ids:
-        #                 target_id = random.sample(enemy_shuimian_ids, 1)[0]
-        #                 target_operator = battle_state.fetch_operator_by_id(target_id)
-        #
-        #                 is_formation = 0
-        #                 # act_content = {"operator_id":"130302","camp": 1,"seat":101,"act_order":"1","act_list":[],"attack_order":"1","attack_list":[{"act_id":1,"type":504,"routes":[],"fp_operator_id":"","src_id":["130302"],"target_id": ["210402"],"aggressivity": "24","ammunition_num": 1,"rounds": 1,"is_suicide_attack": 0,"support_operator_id": "","land_position": "","land_value": 0}]}
-        #                 act_content = {"operator_id": str(our_operator_id), "camp": self._camp_id, "seat": our_operator.seat_id,
-        #                                "act_order": "1", "act_list": [],
-        #                                "attack_order": "1", "attack_list": [{"act_id": 1, "type": 502, "routes": [], "fp_operator_id": "", "src_id":[str(our_operator_id)], "target_id": [str(target_id)], "aggressivity": str(asm_attack), "ammunition_num": 1, "rounds": battle_state.frame.round, "is_suicide_attack": 0, "support_operator_id": "", "land_position": "", "land_value": 0}]}
-        #                 # 每个算子最多调用一次该接口，一次可以设置多个动作，act_list 设置机动动作，attack_list 设置攻击动作
-        #                 # print("ai 发送 一个作战计划")
-        #                 plan = {"type": 502, "operator_id": our_operator_id, "seat": our_operator.seat_id, "act_order": "1", "is_formation": is_formation, "act_content": act_content}
-        #                 plan_list.append(plan)
-        #                 # maneuveringAttack = self._sdk.operator_seat.maneuveringAttack(our_operator_id, '1', is_formation, act_content)
-        #
-        # # print("ai 发送 作战筹划完成")
-        # # self._sdk.operator_seat.attack_finished(battle_state.get_time_section_id())
+        jilong1_info = helper.fetch_operator(self.df_operator, self._camp_id, "jilong1")
+        jilong2_info = helper.fetch_operator(self.df_operator, self._camp_id, "jilong2")
+        chenggong1_info = helper.fetch_operator(self.df_operator, self._camp_id, "chenggong1")
+        chenggong2_info = helper.fetch_operator(self.df_operator, self._camp_id, "chenggong2")
+        if jilong1_info is not None:
+            if jilong1_info["formation_id"] == -1:
+                flag = True
+                operator_id = jilong1_info["operator_id"]
+                formation_id = operator_id
+                start = [jilong1_info["x_position"], jilong1_info["y_position"]]
+                if start == [20, 24]:
+                    end = [22, 27]
+                elif start == [22, 27]:
+                    end = [23, 30]
+                elif start == [23, 30]:
+                    end = [26, 31]
+                elif start == [26, 31]:
+                    end = [27, 31]
+                else:
+                    # 如果不在这些位置，暂时不处理
+                    flag = False
+                if flag:
+                    plan = self.generate_move_plan(operator_id, camp_id, seat_id, formation_id, start, end)
+                    plan_list.append(plan)
+        if jilong2_info is not None:
+            if jilong2_info["formation_id"] == -1:
+                flag = True
+                operator_id = jilong2_info["operator_id"]
+                formation_id = operator_id
+                start = [jilong2_info["x_position"], jilong2_info["y_position"]]
+                if start == [25, 24]:
+                    end = [24, 27]
+                elif start == [22, 27]:
+                    end = [23, 30]
+                elif start == [23, 30]:
+                    end = [26, 31]
+                elif start == [26, 31]:
+                    end = [27, 31]
+                else:
+                    # 如果不在这些位置，暂时不处理
+                    flag = False
+                if flag:
+                    plan = self.generate_move_plan(operator_id, camp_id, seat_id, formation_id, start, end)
+                    plan_list.append(plan)
+        if chenggong1_info is not None:
+            if chenggong1_info["formation_id"] == -1:
+                flag = True
+                operator_id = chenggong1_info["operator_id"]
+                formation_id = operator_id
+                start = [chenggong1_info["x_position"], chenggong1_info["y_position"]]
+                if start == [20, 24]:
+                    end = [22, 27]
+                elif start == [22, 27]:
+                    end = [23, 30]
+                elif start == [23, 30]:
+                    end = [26, 31]
+                elif start == [26, 31]:
+                    end = [27, 31]
+                else:
+                    # 如果不在这些位置，暂时不处理
+                    flag = False
+                if flag:
+                    plan = self.generate_move_plan(operator_id, camp_id, seat_id, formation_id, start, end)
+                    plan_list.append(plan)
+        if chenggong2_info is not None:
+            if chenggong2_info["formation_id"] == -1:
+                flag = True
+                operator_id = chenggong1_info["operator_id"]
+                formation_id = operator_id
+                start = [chenggong1_info["x_position"], chenggong1_info["y_position"]]
+                if start == [25, 24]:
+                    end = [24, 27]
+                elif start == [24, 27]:
+                    end = [23, 30]
+                elif start == [23, 30]:
+                    end = [26, 31]
+                elif start == [26, 31]:
+                    end = [27, 31]
+                else:
+                    # 如果不在这些位置，暂时不处理
+                    flag = False
+                if flag:
+                    plan = self.generate_move_plan(operator_id, camp_id, seat_id, formation_id, start, end)
+                    plan_list.append(plan)
+        formations = helper.fetch_formations(self.df_formation, self._camp_id)
+        for f in formations:
+            flag = True
+            operator_id = f["operator_id"]
+            formation_id = f["formation_id"]
+            start = [f["x_position"], f["y_position"]]
+            if start == [25, 24]:
+                end = [24, 27]
+            elif start == [24, 27]:
+                end = [23, 30]
+            elif start == [20, 24]:
+                end = [22, 27]
+            elif start == [22, 27]:
+                end = [23, 30]
+            elif start == [23, 30]:
+                end = [26, 31]
+            elif start == [26, 31]:
+                end = [27, 31]
+            else:
+               flag = False
+            if flag:
+                plan = self.generate_move_plan(operator_id, camp_id, seat_id, formation_id, start, end)
+                plan_list.append(plan)
 
         self._logger.print(self._round, "ai 发送 作战筹划 %s " %(plan_list))
 
@@ -799,7 +934,8 @@ class AIAlgorithm:
 
         # 在此时节，调用一次下方接口
         # 每个算子可以加plan_list中加一个plan，每个plan可以有多个机动动作、多个攻击动作
-        maneuveringAttack = self._sdk.operator_seat.maneuveringAttack(plan_list)
+        res = self._sdk.operator_seat.maneuveringAttack(plan_list)
+        print(res)
 
     def _attack_and_move(self, battle_state):
         """

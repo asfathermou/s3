@@ -29,3 +29,18 @@ class Helper:
                 val = int(val)
             res[key] = val
         return res
+
+    def fetch_formations(self, df_formation, camp_id):
+        formations = []
+        for i in df_formation.index:
+            _camp_id = df_formation.at[i, "camp_id"]
+            category_id2 = df_formation.at[i, "category_id2"]
+            if _camp_id == str(camp_id) and int(category_id2) == 888:
+                temp = dict(df_formation.loc[i])
+                res = {}
+                for key, val in temp.items():
+                    if type(val) is numpy.int64:
+                        val = int(val)
+                    res[key] = val
+                formations.append(res)
+        return formations
